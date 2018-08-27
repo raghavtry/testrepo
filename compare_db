@@ -1,0 +1,107 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Aug 27 11:21:04 2018
+
+@author: p764270
+"""
+#import sys
+import pandas as pd
+import warnings
+
+#Function to track performance of the script 
+import time
+start = time.time()
+"the code you want to test stays here"
+
+
+# warnings suppress
+def fxn():
+    warnings.warn("deprecated", DeprecationWarning)
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    fxn() 
+   
+warnings.filterwarnings("ignore")
+
+#Reading the traditional excel 
+old = pd.read_excel('Traditional.xlsx', 'Sheet1', na_values=['NA'])
+old.describe()
+xlabels = old['cmx_tran_id'].values
+
+#Reading the hive excel 
+new = pd.read_excel('Hiveactual.xlsx', 'Sheet1', na_values=['NA'])
+new.describe()
+xlabels = new['cmx_tran_id'].values
+
+
+def num_missing(x):
+  return sum(x.isnull())
+
+
+#Applying per column:for Tradintional 
+print ("Missing values per column:")
+df2=pd.DataFrame((old.apply(num_missing, axis=0))) #axis=0 defines that function is to be applied on each column
+writer = pd.ExcelWriter('pandas_simple.xlsx', engine='xlsxwriter')
+old.to_excel(writer, sheet_name='Sheet1')
+df2.to_excel(writer, sheet_name='Sheet2')
+#=========================================================================
+
+#Applying per column:for Tradintional
+print ("Missing values per column in Hive tables:")
+df3=pd.DataFrame((new.apply(num_missing, axis=0))) #axis=0 defines that function is to be applied on each column
+df3.to_excel(writer, sheet_name='Sheet2',startcol=6)
+
+##print (df2)
+#print ("\nMissing values per row:")
+#number_rows = len(df3.index)
+#color_range = "L2:L{}".format(number_rows+1)
+##print (old.apply(num_missing, axis=1).head()) #axis=1 defines that function is to be applied on each row
+##workbook  = writer.book
+##worksheet = writer.sheets['Sheet2']
+##worksheet.conditional_format('B2:B8', {'type': '3_color_scale'})
+#df4=pd.merge(df2, df3)
+#print (df4)
+#df4.to_excel(writer, sheet_name='Sheet2',startcol=10)
+#
+#df3.to_excel(writer, sheet_name='She8et2',startcol=6)
+#cols = df3.columns.tolist()
+#column_to_move = 'H'
+#new_position = 3
+#cols.insert(new_position, cols.pop(cols.index(column_to_move)))
+#df3 = df3[cols]
+
+#for rows in 'Sheet2'.iter_rows():
+#    for cell in rows:
+#        for a, b in zip(mirko, darko):
+#            if a == b:
+#                cell.fill = PatternFill(bgColor="FFC7CE", fill_type = "solid")
+#    else:
+#        color = 'FFBB00'
+
+#Code for colour comparion
+#c=pd.merge(left=A,right=B, how='outer', left_index=True, right_index=True, suffixes=['_a', '_b'])
+#df_new = pd.concat([df2, df3])
+#pd.merge(df_new,on='subject_id')
+#
+#
+#df_new.to_excel(writer, sheet_name='Sheet2',startcol=10)
+#df_all = pd.concat([df2.set_index('cmx_tran_id'), df3.set_index('cmx_tran_id')], 
+#                   axis='columns', keys=['First', 'Second'])
+#def highlight_diff(df_all, color='yellow'):
+#attr = 'background-color: {}'.format(color)
+#other = data.xs('First', axis='columns', level=-1)
+#   return pd.DataFrame(np.where(data.ne(other, level=0), attr, ''),
+#                        index=data.index, columns=data.columns)
+
+#df_final.style.apply(highlight_diff, axis=None)
+
+writer.save()
+
+#for identifying the time taken by the program 
+end = time.time()
+print(end - start)
+
+
+
+
